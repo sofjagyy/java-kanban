@@ -10,21 +10,24 @@ import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
-
     private InMemoryHistoryManager historyManager;
-    private Task task;
-    private Epic epic;
-    private Subtask subtask;
+
+    @BeforeEach
+    void setUp() {
+        historyManager = new InMemoryHistoryManager();
+    }
 
     @Test
     @DisplayName("Должен добавлять несколько задач в правильном порядке")
-    void multiple_tasks_should_be_added_in_correct_order() {
-        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
+    void add_addedInCorrectOrder() {
+
         Task task = new Task("Задача", "Описание", Status.NEW);
         task.setId(1);
         Epic epic = new Epic("Эпик", "Описание", Status.NEW);
@@ -45,7 +48,7 @@ class InMemoryHistoryManagerTest {
 
     @Test
     @DisplayName("Должен удалять дубликат при повторном добавлении задачи")
-    void dublicate_should_be_removed_when_task_added_again() {
+    void add_multipleTasksDeleted() {
         InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
         Task task = new Task("Задача", "Описание", Status.NEW);
         task.setId(1);
@@ -69,7 +72,7 @@ class InMemoryHistoryManagerTest {
 
     @Test
     @DisplayName("Должен удалять задачу из середины истории")
-    void task_should_be_removed_from_middle_of_history() {
+    void remove_TaskRemovedFromTheMiddle() {
         InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
         Task task1 = new Task("Задача1", "Описание", Status.NEW);
         task1.setId(1);
@@ -92,7 +95,7 @@ class InMemoryHistoryManagerTest {
 
     @Test
     @DisplayName("Должен удалять единственную задачу в истории")
-    void single_task_should_be_removed_from_history() {
+    void remove_SingleTaskRemoved() {
         InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
         Task task1 = new Task("Задача1", "Описание", Status.NEW);
         task1.setId(1);
@@ -101,14 +104,15 @@ class InMemoryHistoryManagerTest {
 
         historyManager.remove(1);
 
-        assertTrue(historyManager.isEmpty());
-        assertEquals(0, historyManager.size());
+        ArrayList<Task> history = historyManager.getHistory();
+        assertTrue(history.isEmpty());
+        assertEquals(0, history.size());
         assertTrue(historyManager.getHistory().isEmpty());
     }
 
     @Test
     @DisplayName("Не должен падать при удалении несуществующей задачи")
-    void manager_should_not_fall_when_removing_non_existent_task() {
+    void addingNonExistingTaskId_WorksCorrectly() {
         InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
         Task task1 = new Task("Задача1", "Описание", Status.NEW);
         task1.setId(1);
@@ -128,7 +132,7 @@ class InMemoryHistoryManagerTest {
 
     @Test
     @DisplayName("Эпик с подзадачами должен быть удален при удалении Эпика")
-    void epic_with_subtasks_should_be_removed_from_history_when_epic_deleted() {
+    void removeEpic_removedEpic_itsSubtasksRemovedToo() {
         InMemoryTaskManager taskManager = new InMemoryTaskManager();
         //по условию финальных заданий предыдущих спринтов именнно Manager отвечает за расчет статуса и подзадач Epic, поэтому необходимо создать экземпляр
         Task task = new Task("Задача", "Описание", Status.NEW);

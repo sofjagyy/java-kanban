@@ -3,9 +3,9 @@ package manager.history;
 import model.Task;
 
 public class Node {
-    Task task;
-    Node prev;
-    Node next;
+    protected Task task;
+    protected Node prev;
+    protected Node next;
 
     Node(Task task) {
         this.task = task;

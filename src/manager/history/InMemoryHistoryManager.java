@@ -12,6 +12,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     public InMemoryHistoryManager() {
     }
 
+
     @Override
     public void add(Task task) {
         if (task == null) {
@@ -87,17 +88,4 @@ public class InMemoryHistoryManager implements HistoryManager {
         return tasks;
     }
 
-    public int size() {
-        return nodeMap.size();
-    }
-
-    public boolean isEmpty() {
-        return nodeMap.isEmpty();
-    }
-
-    public void clear() {
-        nodeMap.clear();
-        head = null;
-        tail = null;
-    }
 }
