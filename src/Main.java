@@ -31,7 +31,5 @@ public class Main {
         for (Task task : taskManager.getHistory()) {
             System.out.println(task);
         }
-
-
     }
 }

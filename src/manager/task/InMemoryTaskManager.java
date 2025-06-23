@@ -129,6 +129,7 @@ public class InMemoryTaskManager implements TaskManager {
     //Удаление
     public void removeTask(int id) {
         tasks.remove(id);
+        historyManager.remove(id);
     }
 
     public void removeEpic(int epicId) {
@@ -138,9 +139,11 @@ public class InMemoryTaskManager implements TaskManager {
 
             for (int id : subtaskIds) {
                 subtasks.remove(id);
+                historyManager.remove(id);
             }
 
             epics.remove(epicId);
+            historyManager.remove(epicId);
         }
     }
 
@@ -153,20 +156,36 @@ public class InMemoryTaskManager implements TaskManager {
             updateEpicStatus(epic);
 
             subtasks.remove(subtaskId);
+            historyManager.remove(subtaskId);
         }
     }
 
 
     public void removeTasks(){
+        for (Task task : tasks.values()) {
+            historyManager.remove(task.getId());
+        }
         tasks.clear();
     }
 
     public void removeEpics(){
+        for (Epic epic : epics.values()) {
+            historyManager.remove(epic.getId());
+        }
+
+        for (Subtask subtask : subtasks.values()) {
+            historyManager.remove(subtask.getId());
+        }
+
         epics.clear();
         subtasks.clear();
     }
 
     public void removeSubtasks(){
+        for (Subtask subtask : subtasks.values()) {
+            historyManager.remove(subtask.getId());
+        }
+
         subtasks.clear();
 
         if (!epics.isEmpty()) {
@@ -206,7 +225,6 @@ public class InMemoryTaskManager implements TaskManager {
             return false;
         }
     }
-
 
 
     private void updateEpicStatus(Epic epic) {
