@@ -1,6 +1,5 @@
 package manager.task;
 
-import manager.history.HistoryManager;
 import model.Epic;
 import model.Subtask;
 import model.Task;
@@ -26,11 +25,11 @@ public interface TaskManager {
 
     ArrayList<Subtask> getSubtasksByEpic(Epic epic);
 
-    void addTask(Task task);
+    Task addTask(Task task);
 
-    void addEpic(Epic epic);
+    Epic addEpic(Epic epic);
 
-    void addSubtask(Subtask subtask);
+    Subtask addSubtask(Subtask subtask);
 
     void removeTask(int id);
 

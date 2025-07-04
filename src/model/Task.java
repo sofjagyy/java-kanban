@@ -5,7 +5,7 @@ import java.util.Objects;
 public class Task implements Cloneable{
     protected String name;
     protected String description;
-    protected int id = -1;
+    protected Integer id = null;
     protected Status status;
 
     public Task(String name, String description, Status status) {
@@ -22,8 +22,6 @@ public class Task implements Cloneable{
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException("Ошибка при клонировании", e);
         }
-
-
     }
 
     public String getName () {
@@ -34,7 +32,7 @@ public class Task implements Cloneable{
         return this.description;
     }
 
-    public int getId () {
+    public Integer getId () {
         return this.id;
     }
 
