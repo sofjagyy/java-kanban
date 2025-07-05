@@ -1,4 +1,6 @@
 package model;
+import manager.task.FileBackedTaskManager.TaskType;
+
 import java.util.ArrayList;
 
 public class Epic extends Task {
@@ -28,6 +30,11 @@ public class Epic extends Task {
             throw new IllegalArgumentException("Эпик не может содержать сам себя");
         }
         subtasksIds.add(subtaskId);
+    }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
     }
 
     public void clearSubtasksIds() {

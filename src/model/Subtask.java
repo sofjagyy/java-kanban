@@ -1,5 +1,7 @@
 package model;
 
+import manager.task.FileBackedTaskManager.TaskType;
+
 public class Subtask extends Task {
     private final int epicId;
 
@@ -15,6 +17,16 @@ public class Subtask extends Task {
     @Override
     public Subtask clone() {
         return (Subtask) super.clone();
+    }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.SUBTASK;
+    }
+
+    @Override
+    public String getEpicIdForCSV() {
+        return String.valueOf(epicId);
     }
 
     @Override

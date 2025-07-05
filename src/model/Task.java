@@ -1,5 +1,7 @@
 package model;
 
+import manager.task.FileBackedTaskManager.TaskType;
+
 import java.util.Objects;
 
 public class Task implements Cloneable{
@@ -12,6 +14,14 @@ public class Task implements Cloneable{
         this.name = name;
         this.description = description;
         this.status = status;
+    }
+
+    public TaskType getType() {
+        return TaskType.TASK;
+    }
+
+    public String getEpicIdForCSV() {
+        return "";
     }
 
     @Override
@@ -71,6 +81,17 @@ public class Task implements Cloneable{
         Task task = (Task) o;
 
         return task.id == this.id;
+    }
+
+
+    public String toCSV() {
+        return String.format("%d,%s,%s,%s,%s,%s",
+                getId(),
+                getType(),
+                getName(),
+                getStatus(),
+                getDescription(),
+                getEpicIdForCSV());
     }
 
     @Override

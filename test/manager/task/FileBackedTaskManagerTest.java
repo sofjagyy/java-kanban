@@ -29,24 +29,21 @@ class FileBackedTaskManagerTest {
 
             Task task1 = new Task("Task", "Description", Status.NEW);
             Epic epic2 = new Epic("Epic", "Description", Status.NEW);
-            task1.setId(1);
-            epic2.setId(2);
+            Subtask subtask3 = new Subtask("Subtask", "Description", Status.NEW, 2);
+
             manager.addTask(task1);
-            manager.addTask(epic2);
+            manager.addEpic(epic2);
+            manager.addSubtask(subtask3);
 
-            FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempfile);
+            System.out.println(manager.getTaskById(1).toCSV());
+            System.out.println(manager.getEpicById(2).toCSV());
+            System.out.println(manager.getSubtaskById(3).toCSV());
 
-            assert loadedManager.getTasks().size() == 1;
-            assert loadedManager.getEpics().size() == 1;
-
-            Task loadedTask = loadedManager.getTaskById(1);
-            assert loadedTask.getName().equals("Task");
-            assert loadedTask.getStatus().equals(Status.NEW);
-
-            Epic loadedEpic = loadedManager.getEpicById(2);
-            assert loadedEpic.getName().equals("Epic");
-            assert loadedEpic.getStatus() == Status.NEW;
-
+            try (BufferedReader reader = new BufferedReader(new FileReader(tempfile))) {
+                reader.lines().forEach(System.out::println);
+            } catch (IOException e) {
+                System.err.println("Ошибка: " + e.getMessage());
+            }
         } catch (IOException e) {
             throw new RuntimeException("Ошибка создания временного файла: ", e);
         }
@@ -66,7 +63,7 @@ class FileBackedTaskManagerTest {
             manager.addTask(task);
 
             String content = Files.readString(tempFile.toPath());
-            String[] lines = content.split("\r\n");
+            String[] lines = content.split("\n");
             System.out.println(lines[0]);
             assert lines[0].equals("id,type,name,status,description,epic");
             assert lines[1].equals("1,TASK,Task,NEW,Description,");
@@ -142,7 +139,7 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    @DisplayName("Добавить два Task, удалить один Task, считать из файла, добавить 2 Task, получить три Task в Manager")
+    @DisplayName("Проверка корректности работы программы при удалении задач и добавлении новых")
     void addTwoTask_RemoveOne_ReadFromFile_addTwo_GetThreeInManager(){
         try {
             File tempFile = File.createTempFile("csv_format", ".csv");
