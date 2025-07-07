@@ -1,6 +1,6 @@
-package manager.task.FileBackedTaskManager;
+package manager.task.file;
 
-import manager.task.InMemoryTaskManager;
+import manager.task.memory.InMemoryTaskManager;
 import model.Epic;
 import model.Status;
 import model.Subtask;
@@ -9,9 +9,7 @@ import model.Task;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File file;
@@ -21,14 +19,42 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.file = file;
     }
 
+    public String toCSV(Task task) {
+        return String.format("%d,%s,%s,%s,%s",
+                task.getId(),
+                TaskType.TASK,
+                task.getName(),
+                task.getStatus(),
+                task.getDescription());
+    }
+
+    public String toCSV(Epic epic) {
+        return String.format("%d,%s,%s,%s,%s",
+                epic.getId(),
+                TaskType.EPIC,
+                epic.getName(),
+                epic.getStatus(),
+                epic.getDescription());
+    }
+
+    public String toCSV(Subtask subtask) {
+        return String.format("%d,%s,%s,%s,%s,%s",
+                subtask.getId(),
+                TaskType.SUBTASK,
+                subtask.getName(),
+                subtask.getStatus(),
+                subtask.getDescription(),
+                subtask.getEpicId());
+    }
+
     private void save() {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append(CSV_HEADER + "\n");
 
-            tasks.forEach((id, task) -> sb.append(task.toCSV()).append("\n"));
-            epics.forEach((id, epic) -> sb.append(epic.toCSV()).append("\n"));
-            subtasks.forEach((id, subtasks) -> sb.append(subtasks.toCSV()).append("\n"));
+            tasks.forEach((id, task) -> sb.append(toCSV(task)).append("\n"));
+            epics.forEach((id, epic) -> sb.append(toCSV(epic)).append("\n"));
+            subtasks.forEach((id, subtask) -> sb.append(toCSV(subtask)).append("\n"));
 
             Files.write(file.toPath(), Collections.singleton(sb));
         } catch (IOException e) {
@@ -123,18 +149,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             case TASK:
                 Task task = new Task(name, description, status);
                 task.setId(id);
-                super.addTaskIfUnique(task, tasks);
+                tasks.put(id, task);
                 break;
             case EPIC:
                 Epic epic = new Epic(name, description, status);
                 epic.setId(id);
-                super.addTaskIfUnique(epic, epics);
+                epics.put(id, epic);
                 break;
             case SUBTASK:
                 int epicId = Integer.parseInt(parts[5]);
                 Subtask subtask = new Subtask(name, description, status, epicId);
                 subtask.setId(id);
-                super.addTaskIfUnique(subtask, subtasks);
+                subtasks.put(id, subtask);
                 break;
             default:
                 throw new IllegalArgumentException("Неизвестный тип задачи " + type);

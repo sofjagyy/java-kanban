@@ -1,7 +1,8 @@
-package manager.task;
+package manager.task.memory;
 
 import manager.Managers;
 import manager.history.HistoryManager;
+import manager.task.TaskManager;
 import model.Epic;
 import model.Status;
 import model.Subtask;
@@ -24,7 +25,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     public InMemoryTaskManager() {
     }
-    //Геттеры
+
 
     public Task getTaskById(int id) {
         Task task = tasks.get(id);

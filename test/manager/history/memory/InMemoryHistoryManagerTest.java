@@ -1,8 +1,6 @@
-package manager.history;
+package manager.history.memory;
 
-import manager.task.InMemoryTaskManager;
-import manager.task.TaskManager;
-import manager.Managers;
+import manager.task.memory.InMemoryTaskManager;
 import model.Epic;
 import model.Status;
 import model.Subtask;
@@ -11,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;

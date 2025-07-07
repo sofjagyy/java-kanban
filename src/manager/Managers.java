@@ -1,8 +1,8 @@
 package manager;
 
 import manager.history.HistoryManager;
-import manager.history.InMemoryHistoryManager;
-import manager.task.InMemoryTaskManager;
+import manager.history.memory.InMemoryHistoryManager;
+import manager.task.memory.InMemoryTaskManager;
 import manager.task.TaskManager;
 
 public final class Managers {
