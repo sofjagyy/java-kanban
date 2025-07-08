@@ -17,7 +17,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected final HashMap<Integer, Epic> epics = new HashMap<>();
     protected final HashMap<Integer, Subtask> subtasks = new HashMap<>();
     protected int idCounter = 1;
-    public final HistoryManager historyManager = Managers.getDefaultHistory();
+    protected final HistoryManager historyManager = Managers.getDefaultHistory();
 
     private void incIdCounter() {
         idCounter += 1;
@@ -26,6 +26,9 @@ public class InMemoryTaskManager implements TaskManager {
     public InMemoryTaskManager() {
     }
 
+    public HistoryManager getHistoryManager() {
+        return historyManager;
+    }
 
     public Task getTaskById(int id) {
         Task task = tasks.get(id);
@@ -74,7 +77,7 @@ public class InMemoryTaskManager implements TaskManager {
     //Добавление
     public Task addTask(Task task) {
         task.setId(idCounter);
-        addTaskIfUnique(task, tasks);
+        tasks.put(task.getId(), task);
         incIdCounter();
 
         return task;
@@ -82,7 +85,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     public Epic addEpic(Epic epic) {
         epic.setId(idCounter);
-        addTaskIfUnique(epic, epics);
+        epics.put(epic.getId(), epic);
         incIdCounter();
 
         return epic;
@@ -94,30 +97,13 @@ public class InMemoryTaskManager implements TaskManager {
         if (epics.containsKey(epicId)) {
             subtask.setId(idCounter);
             incIdCounter();
-            addTaskIfUnique(subtask, subtasks);
-
+            subtasks.put(subtask.getId(), subtask);
             Epic epic = epics.get(epicId);
             epic.addSubtaskId(subtask.getId());
             updateEpicStatus(epic);
         }
 
         return subtask;
-    }
-
-    protected <T extends Task> void addTaskIfUnique(T task, HashMap<Integer, T> collection) {
-        int id = task.getId();
-
-        if (id <= 0) {
-            System.out.println("Ошибка: ID должен быть положительным числом.");
-            return;
-        }
-
-        if (tasks.containsKey(id) || epics.containsKey(id) || subtasks.containsKey(id)) {
-            System.out.println("Предупреждение: ID " + id + " уже используется. Задача не добавлена.");
-            return;
-        }
-
-        collection.put(id, task);
     }
 
     //Удаление

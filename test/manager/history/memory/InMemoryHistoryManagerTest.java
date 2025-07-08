@@ -133,27 +133,24 @@ class InMemoryHistoryManagerTest {
         InMemoryTaskManager taskManager = new InMemoryTaskManager();
         //по условию финальных заданий предыдущих спринтов именнно Manager отвечает за расчет статуса и подзадач Epic, поэтому необходимо создать экземпляр
         Task task = new Task("Задача", "Описание", Status.NEW);
-        task.setId(1);
         Epic epic = new Epic("Эпик", "Описание", Status.NEW);
-        epic.setId(2);
         Subtask subtask = new Subtask("Подзадача", "Описание", Status.NEW, 2);
-        subtask.setId(3);
 
         taskManager.addTask(task);
         taskManager.addEpic(epic);
         taskManager.addSubtask(subtask);
 
-        taskManager.historyManager.add(task);
-        taskManager.historyManager.add(epic);
-        taskManager.historyManager.add(subtask);
+        taskManager.getHistoryManager().add(task);
+        taskManager.getHistoryManager().add(epic);
+        taskManager.getHistoryManager().add(subtask);
 
-        ArrayList<Task> history = (ArrayList<Task>) taskManager.historyManager.getHistory();
+        ArrayList<Task> history = (ArrayList<Task>) taskManager.getHistory();
 
         assertEquals(3, history.size());
 
         taskManager.removeEpic(2);
 
-        history = (ArrayList<Task>) taskManager.historyManager.getHistory();
+        history = (ArrayList<Task>) taskManager.getHistory();
 
         assertEquals(1, history.size());
     }
