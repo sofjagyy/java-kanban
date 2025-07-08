@@ -19,7 +19,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.file = file;
     }
 
-    public String toCSV(Task task) {
+    private String toCSV(Task task) {
         return String.format("%d,%s,%s,%s,%s",
                 task.getId(),
                 TaskType.TASK,
@@ -28,7 +28,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 task.getDescription());
     }
 
-    public String toCSV(Epic epic) {
+    private String toCSV(Epic epic) {
         return String.format("%d,%s,%s,%s,%s",
                 epic.getId(),
                 TaskType.EPIC,
@@ -37,7 +37,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 epic.getDescription());
     }
 
-    public String toCSV(Subtask subtask) {
+    private String toCSV(Subtask subtask) {
         return String.format("%d,%s,%s,%s,%s,%s",
                 subtask.getId(),
                 TaskType.SUBTASK,
@@ -167,7 +167,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    public static FileBackedTaskManager loadFromFile(File file) {
+    protected static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
 
         if (!file.exists()) {
