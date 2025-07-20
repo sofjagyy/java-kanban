@@ -1,9 +1,9 @@
-package manager.history;
+package manager.history.memory;
 
+import manager.history.HistoryManager;
 import model.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private HashMap<Integer, Node> nodeMap = new HashMap<>();

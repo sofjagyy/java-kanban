@@ -1,6 +1,5 @@
-package manager.task;
+package manager.task.memory;
 
-import manager.Managers;
 import model.Epic;
 import model.Status;
 import model.Subtask;

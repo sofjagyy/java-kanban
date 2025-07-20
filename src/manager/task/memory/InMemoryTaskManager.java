@@ -1,8 +1,8 @@
-package manager.task;
+package manager.task.memory;
 
 import manager.Managers;
 import manager.history.HistoryManager;
-import manager.history.InMemoryHistoryManager;
+import manager.task.TaskManager;
 import model.Epic;
 import model.Status;
 import model.Subtask;
@@ -13,20 +13,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final HashMap<Integer, Task> tasks = new HashMap<>();
-    private final HashMap<Integer, Epic> epics = new HashMap<>();
-    private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private int idCounter = 1;
-    public final HistoryManager historyManager = Managers.getDefaultHistory();
+    protected final HashMap<Integer, Task> tasks = new HashMap<>();
+    protected final HashMap<Integer, Epic> epics = new HashMap<>();
+    protected final HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    protected int idCounter = 1;
+    protected final HistoryManager historyManager = Managers.getDefaultHistory();
 
     private void incIdCounter() {
         idCounter += 1;
     }
 
     public InMemoryTaskManager() {
-
     }
-    //Геттеры
+
+    public HistoryManager getHistoryManager() {
+        return historyManager;
+    }
 
     public Task getTaskById(int id) {
         Task task = tasks.get(id);
@@ -73,57 +75,35 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     //Добавление
-    public void addTask(Task task) {
-        if (task.getId() == -1) {
-            task.setId(idCounter);
-            incIdCounter();
-        }
-        addTaskIfUnique(task, tasks);
+    public Task addTask(Task task) {
+        task.setId(idCounter);
+        tasks.put(task.getId(), task);
+        incIdCounter();
+
+        return task;
     }
 
-    public void addEpic(Epic epic) {
-        if (epic.getId() == -1) {
-            epic.setId(idCounter);
-            incIdCounter();
-        }
-        addTaskIfUnique(epic, epics);
+    public Epic addEpic(Epic epic) {
+        epic.setId(idCounter);
+        epics.put(epic.getId(), epic);
+        incIdCounter();
+
+        return epic;
     }
 
-    public void addSubtask(Subtask subtask) {
+    public Subtask addSubtask(Subtask subtask) {
         int epicId = subtask.getEpicId();
 
-        if (subtask.getId() == epicId) {
-            throw new IllegalArgumentException("Подзадача не может быть своим собственным эпиком");
-        }
-
         if (epics.containsKey(epicId)) {
-            if (subtask.getId() == -1) {
-                subtask.setId(idCounter);
-                incIdCounter();
-            }
-
-            addTaskIfUnique(subtask, subtasks);
-
+            subtask.setId(idCounter);
+            incIdCounter();
+            subtasks.put(subtask.getId(), subtask);
             Epic epic = epics.get(epicId);
             epic.addSubtaskId(subtask.getId());
             updateEpicStatus(epic);
         }
-    }
 
-    private <T extends Task> void addTaskIfUnique(T task, HashMap<Integer, T> collection) {
-        int id = task.getId();
-
-        if (id <= 0) {
-            System.out.println("Ошибка: ID должен быть положительным числом.");
-            return;
-        }
-
-        if (tasks.containsKey(id) || epics.containsKey(id) || subtasks.containsKey(id)) {
-            System.out.println("Предупреждение: ID " + id + " уже используется. Задача не добавлена.");
-            return;
-        }
-
-        collection.put(id, task);
+        return subtask;
     }
 
     //Удаление
@@ -225,7 +205,6 @@ public class InMemoryTaskManager implements TaskManager {
             return false;
         }
     }
-
 
     private void updateEpicStatus(Epic epic) {
         ArrayList<Subtask> subtasks = getSubtasksByEpic(epic);
