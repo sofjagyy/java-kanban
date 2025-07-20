@@ -25,14 +25,14 @@ public class InMemoryTaskManager implements TaskManager {
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
     protected final TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
 
-    private void incIdCounter() {
-        idCounter += 1;
+    private int getNextId() {
+        return idCounter++;
     }
 
     public InMemoryTaskManager() {
     }
 
-    public HistoryManager getHistoryManager() {
+    private HistoryManager getHistoryManager() {
         return historyManager;
     }
 
@@ -82,12 +82,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     //Добавление
     public Task addTask(Task task) {
-        if (hasTimeConflict(task)) {
-            throw new IllegalArgumentException("Задача пересекается по времени с другими задачами");
-        }
-        task.setId(idCounter);
+        checkTimeInterception(task);
+        task.setId(getNextId());
         tasks.put(task.getId(), task);
-        incIdCounter();
         if (task.getStartTime() != null) {
             prioritizedTasks.add(task);
         }
@@ -95,9 +92,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public Epic addEpic(Epic epic) {
-        epic.setId(idCounter);
+        epic.setId(getNextId());
         epics.put(epic.getId(), epic);
-        incIdCounter();
 
         return epic;
     }
@@ -105,28 +101,27 @@ public class InMemoryTaskManager implements TaskManager {
     public Subtask addSubtask(Subtask subtask) {
         int epicId = subtask.getEpicId();
 
-        if (epics.containsKey(epicId)) {
-            if (hasTimeConflict(subtask)) {
-                throw new IllegalArgumentException("Подзадача пересекается по времени с другими задачами");
-            }
-            subtask.setId(idCounter);
-            incIdCounter();
+        if (!epics.containsKey(epicId)) {
+            throw new NotFoundException("Эпик с ID " + epicId + " не найден");
+        }
 
-            subtasks.put(subtask.getId(), subtask);
-            Epic epic = epics.get(epicId);
-            epic.addSubtaskId(subtask.getId());
-            updateEpicStatus(epic);
+        checkTimeInterception(subtask);
+        subtask.setId(getNextId());
 
-            if (subtask.getStartTime() != null) {
-                prioritizedTasks.add(subtask);
-                updateEpicTime(epic);
-            }
+        subtasks.put(subtask.getId(), subtask);
+        Epic epic = epics.get(epicId);
+        epic.addSubtaskId(subtask.getId());
+        updateEpicStatus(epic);
+
+        if (subtask.getStartTime() != null) {
+            prioritizedTasks.add(subtask);
+            updateEpicTime(epic);
         }
 
         return subtask;
     }
 
-    //Удаление
+
     public void removeTask(int id) {
         Task task = tasks.get(id);
         if (task != null) {
@@ -212,9 +207,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Обновление
     public void updateTask(Task task) {
-        if (hasTimeConflict(task)) {
-            throw new IllegalArgumentException("Задача пересекается по времени с другими задачами");
-        }
+        checkTimeInterception(task);
         Task oldTask = tasks.get(task.getId());
         if (oldTask != null) {
             prioritizedTasks.remove(oldTask);
@@ -226,9 +219,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public void updateSubtask(Subtask subtask) {
-        if (hasTimeConflict(subtask)) {
-            throw new IllegalArgumentException("Подзадача пересекается по времени с другими задачами");
-        }
+        checkTimeInterception(subtask);
         Subtask oldSubtask = subtasks.get(subtask.getId());
         if (oldSubtask != null) {
             prioritizedTasks.remove(oldSubtask);
@@ -299,6 +290,12 @@ public class InMemoryTaskManager implements TaskManager {
         LocalDateTime end2 = task2.getEndTime();
 
         return task1.getStartTime().isBefore(end2) && task2.getStartTime().isBefore(end1);
+    }
+
+    private void checkTimeInterception(Task task) {
+        if (hasTimeConflict(task)) {
+            throw new IllegalArgumentException("Задача пересекается по времени с другими задачами");
+        }
     }
 
     private boolean hasTimeConflict(Task newTask) {

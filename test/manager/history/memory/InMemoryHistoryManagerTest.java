@@ -2,6 +2,7 @@ package manager.history.memory;
 
 import manager.task.TaskManagerTest;
 import manager.task.memory.InMemoryTaskManager;
+import manager.task.memory.NotFoundException;
 import model.Epic;
 import model.Status;
 import model.Subtask;
@@ -132,27 +133,40 @@ class InMemoryHistoryManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     @DisplayName("Эпик с подзадачами должен быть удален при удалении Эпика")
     void removeEpic_removedEpic_itsSubtasksRemovedToo() {
         InMemoryTaskManager taskManager = new InMemoryTaskManager();
-        //по условию финальных заданий предыдущих спринтов именнно Manager отвечает за расчет статуса и подзадач Epic, поэтому необходимо создать экземпляр
+
         Task task = new Task("Задача", "Описание", Status.NEW);
         Epic epic = new Epic("Эпик", "Описание", Status.NEW);
-        Subtask subtask = new Subtask("Подзадача", "Описание", Status.NEW, 2);
 
         taskManager.addTask(task);
         taskManager.addEpic(epic);
+
+        // Создаем подзадачу с правильным ID эпика
+        Subtask subtask = new Subtask("Подзадача", "Описание", Status.NEW, epic.getId());
         taskManager.addSubtask(subtask);
 
-        taskManager.getHistoryManager().add(task);
-        taskManager.getHistoryManager().add(epic);
-        taskManager.getHistoryManager().add(subtask);
+        // Добавляем в историю через публичные методы get
+        taskManager.getTaskById(task.getId());
+        taskManager.getEpicById(epic.getId());
+        taskManager.getSubtaskById(subtask.getId());
 
         ArrayList<Task> history = (ArrayList<Task>) taskManager.getHistory();
-
         assertEquals(3, history.size());
 
-        taskManager.removeEpic(2);
+        taskManager.removeEpic(epic.getId());
 
         history = (ArrayList<Task>) taskManager.getHistory();
-
         assertEquals(1, history.size());
+    }
+
+    @Test
+    @DisplayName("Должен выбрасывать исключение при попытке добавить подзадачу к несуществующему эпику")
+    void addSubtask_nonExistentEpic_throwsNotFoundException() {
+        InMemoryTaskManager taskManager = new InMemoryTaskManager();
+
+        Subtask subtask = new Subtask("Подзадача", "Описание", Status.NEW, 999);
+
+        assertThrows(NotFoundException.class, () -> {
+            taskManager.addSubtask(subtask);
+        });
     }
 }
