@@ -3,6 +3,7 @@ package manager.task;
 import model.Epic;
 import model.Subtask;
 import model.Task;
+
 import java.util.List;
 
 import java.util.ArrayList;
@@ -46,4 +47,6 @@ public interface TaskManager {
     void updateTask(Task task);
 
     void updateSubtask(Subtask subtask);
+
+    List<Task> getPrioritizedTasks();
 }
