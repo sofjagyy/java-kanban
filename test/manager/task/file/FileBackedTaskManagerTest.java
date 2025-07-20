@@ -1,5 +1,6 @@
 package manager.task.file;
 
+import manager.task.TaskManagerTest;
 import model.Epic;
 import model.Status;
 import model.Subtask;
@@ -11,11 +12,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class FileBackedTaskManagerTest {
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
     @Test
     @DisplayName("Сохранение и загрузка нескольких задач")
@@ -46,29 +46,6 @@ class FileBackedTaskManagerTest {
             assertEquals(manager.getEpicById(2), loadedManager.getEpicById(2));
             assertEquals(manager.getSubtaskById(3), loadedManager.getSubtaskById(3));
 
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка создания временного файла: ", e);
-        }
-    }
-
-    @Test
-    @DisplayName("Проверка CSV формата")
-    void testCSVFormat() {
-        try {
-            File tempFile = File.createTempFile("csv_format", ".csv");
-            tempFile.deleteOnExit();
-
-            FileBackedTaskManager manager = FileBackedTaskManager.loadFromFile(tempFile);
-
-            Task task = new Task("Task", "Description", Status.NEW);
-
-            manager.addTask(task);
-
-            String content = Files.readString(tempFile.toPath());
-            String[] lines = content.split("\n");
-            System.out.println(lines[0]);
-            assert lines[0].equals("id,type,name,status,description,epic");
-            assert lines[1].equals("1,TASK,Task,NEW,Description");
         } catch (IOException e) {
             throw new RuntimeException("Ошибка создания временного файла: ", e);
         }

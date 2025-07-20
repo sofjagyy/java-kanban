@@ -2,6 +2,7 @@ package manager.history.memory;
 
 import manager.history.HistoryManager;
 import model.Task;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -9,6 +10,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     private HashMap<Integer, Node> nodeMap = new HashMap<>();
     private Node tail;
     private Node head;
+
     public InMemoryHistoryManager() {
     }
 
@@ -36,7 +38,9 @@ public class InMemoryHistoryManager implements HistoryManager {
             removeNode(nodeToRemove);
             nodeMap.remove(id);
         }
-    };
+    }
+
+    ;
 
     @Override
     public ArrayList<Task> getHistory() {
